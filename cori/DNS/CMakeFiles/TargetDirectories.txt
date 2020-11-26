@@ -1,0 +1,14 @@
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/CMakeFiles/rebuild_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/CMakeFiles/edit_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/climate/CMakeFiles/rebuild_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/climate/CMakeFiles/climate.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/climate/CMakeFiles/edit_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/iFluid/CMakeFiles/rebuild_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/iFluid/CMakeFiles/ifluid.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/iFluid/CMakeFiles/edit_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/src/CMakeFiles/rebuild_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/src/CMakeFiles/frontier.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/src/CMakeFiles/edit_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/solver/CMakeFiles/rebuild_cache.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/solver/CMakeFiles/solver.dir
+/global/cscratch1/sd/zhangtao/acme_scratch/DNS/solver/CMakeFiles/edit_cache.dir
