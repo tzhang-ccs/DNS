@@ -6,7 +6,7 @@
 git clone git@github.com:eexcalibur/DNS_install.git
 
 cp DNS_install/faster/CMakeLists.txt  DNS/
-cp DNS_install/faster/cmake-modules/*  DNS/
+cp DNS_install/faster/cmake-modules/*  DNS/cmake-modules
 cp DNS_install/faster/run_DNS.sh DNS/climate
 ```
 
