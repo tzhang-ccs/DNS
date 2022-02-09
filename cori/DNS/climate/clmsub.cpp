@@ -328,26 +328,26 @@ void init_vapor_state_func(
         switch(eqn_params->init_vapor_state)
         {
 	    case TB_STATE:
-		vcartesian->getInitialVaporState = tb_state;
+		    vcartesian->getInitialVaporState = tb_state;
 	        break;
 	    case LR_STATE:
-		vcartesian->getInitialVaporState = lr_state;
+		    vcartesian->getInitialVaporState = lr_state;
 	        break;
 	    case FOURIER_STATE:
-		vcartesian->getInitialVaporState = vFourier_state;
-		break;
+		    vcartesian->getInitialVaporState = vFourier_state;
+		    break;
 	    case RAND_STATE:
 	    case CONST_STATE:
-		vcartesian->getInitialVaporState = NULL;
-                break;
+		    vcartesian->getInitialVaporState = NULL;
+            break;
 	    case SINE_STATE:
-		vcartesian->getInitialVaporState = sine_state;
-		break;
-            default:
-		printf("State %d is not implemented\n",
+		    vcartesian->getInitialVaporState = sine_state;
+		    break;
+        default:
+		    printf("State %d is not implemented\n",
 			eqn_params->init_vapor_state);
-		clean_up(ERROR);
-		break;
+		    clean_up(ERROR);
+		    break;
         }
 }	/* end init_vapor_state_func */
    
@@ -377,16 +377,16 @@ void init_temp_state_func(
         switch(eqn_params->init_temp_state)
         {
 	    case PRESET_STATE:
-		vcartesian->getInitialTempState = nb_state;
+		    vcartesian->getInitialTempState = nb_state;
 	        break;
 	    case RAND_STATE:
 	    case CONST_STATE:
-		vcartesian->getInitialTempState = NULL;
-		break;
-            default:
-		printf("State %d is not implemented\n",
+		    vcartesian->getInitialTempState = NULL;
+		    break;
+        default:
+		    printf("State %d is not implemented\n",
 			eqn_params->init_temp_state);
-		clean_up(ERROR);
+		    clean_up(ERROR);
         }
 }	/* end init_fluid_state_func */
 
@@ -1042,15 +1042,15 @@ extern void ParticlePropagate(Front *fr)
 	if (debugging("trace"))
 	    printf("Entering ParticlePropage()\n");
 	start_clock("ParticlePropagate");
-        RECT_GRID *gr = FT_GridIntfcTopGrid(fr);
-        RECT_GRID *rect_grid = &(fr->pp_grid->Global_grid);
-        IF_PARAMS *iFparams = (IF_PARAMS*)fr->extra1;
+    RECT_GRID *gr = FT_GridIntfcTopGrid(fr);
+    RECT_GRID *rect_grid = &(fr->pp_grid->Global_grid);
+    IF_PARAMS *iFparams = (IF_PARAMS*)fr->extra1;
 	PARAMS *eqn_params = (PARAMS*)fr->extra2;
 	PARTICLE* particle_array = eqn_params->particle_array;
 	double **vel = iFparams->field->vel;
 	double *supersat = eqn_params->field->supersat;
 	double *gravity = iFparams->gravity;
-        int *gmax = FT_GridIntfcTopGmax(fr);
+    int *gmax = FT_GridIntfcTopGmax(fr);
 	int i, j, index, dim = gr->dim;
 	double T;
 	int ic[MAXD];
@@ -1062,8 +1062,8 @@ extern void ParticlePropagate(Front *fr)
 	double dt = fr->dt;
 
         /*computing finite respone time*/
-        double rho_0    = iFparams->rho2;/*fluid density*/
-        double mu       = iFparams->mu2;/*viscosity*/
+    double rho_0    = iFparams->rho2;/*fluid density*/
+    double mu       = iFparams->mu2;/*viscosity*/
 	double R, rho, tau_p, delta_R;
 	double R_max = 0;
 	double R_min = HUGE;
@@ -1072,13 +1072,13 @@ extern void ParticlePropagate(Front *fr)
 	for (i = 0; i < eqn_params->num_drops; i++)
 	{
             /*computing finite respone time*/
-            R        = particle_array[i].radius;/*droplet radius*/
-            rho      = particle_array[i].rho;/*water droplet density*/
-            tau_p    = 2 * rho*R*R/(9*rho_0*mu);/*response time*/
+        R        = particle_array[i].radius;/*droplet radius*/
+        rho      = particle_array[i].rho;/*water droplet density*/
+        tau_p    = 2 * rho*R*R/(9*rho_0*mu);/*response time*/
 
 	    if (R == 0)
 	    {
-		R_min = 0;
+		    R_min = 0;
 	        continue;
 	    }
 	    /*find index at coords*/
@@ -1090,7 +1090,7 @@ extern void ParticlePropagate(Front *fr)
 	    s = supersat[index];
 
 	    for (j = 0; j < dim; j++)
-	     FT_IntrpStateVarAtCoords(fr,LIQUID_COMP,center,
+	        FT_IntrpStateVarAtCoords(fr,LIQUID_COMP,center,
 				vel[j],getStateVel[j],&u[j],&vel[j][index]);
 	    FT_IntrpStateVarAtCoords(fr,LIQUID_COMP,center,
 				supersat,getStateSuper,&s,&s);
@@ -1101,19 +1101,19 @@ extern void ParticlePropagate(Front *fr)
 	        delta_R = R*R;
 
 	    if(delta_R < 0)
-		R = 0;
+		    R = 0;
 	    else
 	        R = sqrt(delta_R);
 
 	    particle_array[i].radius = R;
 	    /*save max and min radius*/
 	    if(R > R_max)
-		R_max = R;
+		    R_max = R;
 	    if(R < R_min)
-		R_min = R;
+		    R_min = R;
 	    /*compute velocity for particle[i] with implicit method*/
 	    for(j = 0; j < dim; ++j)
-            {
+        {
 		//update velocity and position of particles
                 //according to the ode system
                 //dx/dt = v

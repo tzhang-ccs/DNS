@@ -68,7 +68,7 @@ void VCARTESIAN::initMesh(void)
 	    for (i = 0; i <= top_gmax[0]; i++)
 	    {
 	    	crds[0] = top_L[0] + top_h[0]*i;
-		index = d_index1d(i,top_gmax);
+		    index = d_index1d(i,top_gmax);
 	    	cell_center[index].setCoords(crds,dim);
 	    	cell_center[index].icoords[0] = i;
 	    }
@@ -78,7 +78,7 @@ void VCARTESIAN::initMesh(void)
 	    {
 	    	crds[0] = top_L[0] + top_h[0]*i;
 	    	crds[1] = top_L[1] + top_h[1]*j;
-		index = d_index2d(i,j,top_gmax);
+		    index = d_index2d(i,j,top_gmax);
 	    	cell_center[index].setCoords(crds,dim);
 	    	cell_center[index].icoords[0] = i;
 	    	cell_center[index].icoords[1] = j;
@@ -92,7 +92,7 @@ void VCARTESIAN::initMesh(void)
 	    	crds[0] = top_L[0] + top_h[0]*i;
 	    	crds[1] = top_L[1] + top_h[1]*j;
 	    	crds[2] = top_L[2] + top_h[2]*k;
-		index = d_index3d(i,j,k,top_gmax);
+		    index = d_index3d(i,j,k,top_gmax);
 	    	cell_center[index].setCoords(crds,dim);
 	    	cell_center[index].icoords[0] = i;
 	    	cell_center[index].icoords[1] = j;
@@ -307,14 +307,14 @@ void VCARTESIAN::setIndexMap(COMPONENT sub_comp)
 	case 1:
 	    for (i = imin; i <= imax; i++)
 	    {
-		ic = d_index1d(i,top_gmax);
-		if (sub_comp == NO_COMP || cell_center[ic].comp == sub_comp)
-		{
+		    ic = d_index1d(i,top_gmax);
+		    if (sub_comp == NO_COMP || cell_center[ic].comp == sub_comp)
+		    {
 	    	    i_to_I[i] = index + ilower;
 	    	    index++;
-		}
-		else
-		    i_to_I[i] = -1;
+		    }
+		    else
+		        i_to_I[i] = -1;
 	    }
 	    FT_ParallelExchCellIndex(front,llbuf,uubuf,(POINTER)i_to_I);
 	    break;
@@ -371,29 +371,28 @@ void VCARTESIAN::computeAdvection()
 	{
 		if(sub_comp[i] == SOLID_COMP)
 		    continue;
-	        setGlobalIndex(sub_comp[i]);
-	        if (eqn_params->num_scheme == CRANK_NICOLSON)
+	    setGlobalIndex(sub_comp[i]);
+	    if (eqn_params->num_scheme == CRANK_NICOLSON)
 		{
 		    if(eqn_params->prob_type == PARTICLE_TRACKING)
 	    		computeVaporSource();
 		    else
 	    		computeVolumeForce();
 
-	    	    computeAdvectionCN(sub_comp[i],field->vapor,eqn_params->D);
-		    
+	    	computeAdvectionCN(sub_comp[i],field->vapor,eqn_params->D);
 		    computeTemperatureSource();
-	    	    computeAdvectionCN(sub_comp[i],field->temperature,eqn_params->D);
+	        computeAdvectionCN(sub_comp[i],field->temperature,eqn_params->D);
 		}
-	        else if (eqn_params->num_scheme == WENO_CRANK_NICOLSON)
+	    else if (eqn_params->num_scheme == WENO_CRANK_NICOLSON)
 		{
 		    if(eqn_params->prob_type == PARTICLE_TRACKING)
 	    		computeVaporSource();
 		    else
 	    		computeVolumeForce();
-	    	    computeAdvectionWENO(sub_comp[i],field->vapor,eqn_params->D);
+	    	computeAdvectionWENO(sub_comp[i],field->vapor,eqn_params->D);
 
 		    computeTemperatureSource();
-	    	    computeAdvectionWENO(sub_comp[i],field->temperature,eqn_params->D);
+	    	computeAdvectionWENO(sub_comp[i],field->temperature,eqn_params->D);
 		}
 	}
 }
@@ -407,10 +406,10 @@ void VCARTESIAN::computeAdvectionWENO(COMPONENT sub_comp,double* Temp,const doub
 	COMPONENT comp;
 	PETSc solver;
 	double *x;
-        long long num_iter = 0;
-        double rel_residual = 0;
-        boolean fr_crx_grid_seg;
-        const GRID_DIRECTION dir[3][2] =
+    long long num_iter = 0;
+    double rel_residual = 0;
+    boolean fr_crx_grid_seg;
+    const GRID_DIRECTION dir[3][2] =
                 {{WEST,EAST},{SOUTH,NORTH},{LOWER,UPPER}};
 	double v[MAXD];
 
@@ -2556,12 +2555,10 @@ void VCARTESIAN::checkField()
 
 	count = 0;
 	for(j = 0; j < comp_size; j++)
-        {
-                if(field->temperature[j] != prev)
+    {
+        if(field->temperature[j] != prev)
 		{
-                    printf("%s[%d] = %20.14f\n",
-                        "temperature",j,
-                        field->temperature[j]);
+            printf("%s[%d] = %20.14f\n","temperature",j,field->temperature[j]);
 		    prev = field->temperature[j];
 		    count ++;
 		}
@@ -2570,61 +2567,55 @@ void VCARTESIAN::checkField()
 		    printf("......\n");
 		    break;
 		}
-        }
+     }
 
 	count = 0;
-        for(j = 0; j < comp_size; j++)
-        {
+    for(j = 0; j < comp_size; j++)
+    {
 		if(field->vapor[j] != prev)
-                { 
-		    printf("%s[%d] = %20.14f\n",
-                        "vapor",j,
-                        field->vapor[j]);
+        { 
+		    printf("%s[%d] = %20.14f\n","vapor",j,field->vapor[j]);
 		    prev = field->vapor[j];
 		    count ++;
 		}
 		if(count > 20)
-                {
-                    printf("......\n");
-                    break;
-                }
+        {
+            printf("......\n");
+            break;
         }
+    }
 
 	count = 0;
-        for(j = 0; j < comp_size; j++)
-        {
+    for(j = 0; j < comp_size; j++)
+    {
 		if(field->supersat[j] != prev)
-                {
-		    printf("%s[%d] = %20.14f\n",
-                        "supersat",j,
-                        field->supersat[j]);
+        {
+		    printf("%s[%d] = %20.14f\n","supersat",j,field->supersat[j]);
 		    prev = field->supersat[j];
 		    count++;
 		}
 		if(count > 20)
-                {
-                    printf("......\n");
-                    break;
-                }
+        {
+            printf("......\n");
+            break;
         }
+     }
 	
 	count = 0;
-        for(j = 0; j < comp_size; j++)
-        {
+    for(j = 0; j < comp_size; j++)
+    {
 		if(field->drops[j] != prev)
-                {
-		    printf("%s[%d] = %20.14f\n",
-                        "drops",j,
-                        field->drops[j]);
+        {
+		    printf("%s[%d] = %20.14f\n","drops",j,field->drops[j]);
 		    prev = field->drops[j];
 		    count++;
 		}
 		if(count > 20)
-                {
-                    printf("......\n");
-                    break;
-                }
+        {
+            printf("......\n");
+            break;
         }
+    }
 
 	int s_count = 0, l_count = 0, o_count = 0;
 	if (dim == 2)

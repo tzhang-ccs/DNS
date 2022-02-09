@@ -62,11 +62,11 @@ int main(int argc, char **argv)
 	static IF_PARAMS iFparams;
 	int dim;
 
-	FT_Init(argc,argv,&f_basic);
-        PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
+	FT_Init(argc,argv,&f_basic); //Read parameters from command line 
+    PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
 
-	VCARTESIAN *v_cartesian = new VCARTESIAN(front);
-	Incompress_Solver_Smooth_Basis *l_cartesian = NULL;
+	VCARTESIAN *v_cartesian = new VCARTESIAN(front); //vapor and temp
+	Incompress_Solver_Smooth_Basis *l_cartesian = NULL; //velocity
 	if (f_basic.dim == 2)
 	    l_cartesian = new Incompress_Solver_Smooth_2D_Cartesian(front);
 	else if (f_basic.dim == 3)
@@ -77,10 +77,10 @@ int main(int argc, char **argv)
 
 	in_name      		= f_basic.in_name;
 	restart_state_name      = f_basic.restart_state_name;
-        out_name     		= f_basic.out_name;
-        restart_name 		= f_basic.restart_name;
-        RestartRun   		= f_basic.RestartRun;
-        ReadFromInput   	= f_basic.ReadFromInput;
+    out_name     		= f_basic.out_name;
+    restart_name 		= f_basic.restart_name;
+    RestartRun   		= f_basic.RestartRun;
+    ReadFromInput   	= f_basic.ReadFromInput;
 	RestartStep 		= f_basic.RestartStep;
 	dim	 		= f_basic.dim;
 
@@ -96,7 +96,9 @@ int main(int argc, char **argv)
     FT_ReadSpaceDomain(in_name,&f_basic);
     printf("zhangtao: %d in file %s\n", __LINE__, __FILE__);
 
+    //	Initialize front computational grid, interface and function hooks, default function calls
 	FT_StartUp(&front,&f_basic);
+    //Initialize strings for debugging option of the problem, read the input file
 	FT_InitDebug(in_name);
 
 
@@ -107,23 +109,24 @@ int main(int argc, char **argv)
 	read_CL_prob_type(&front);
 	read_movie_options(in_name,&eqn_params);
 	readPhaseParams(&front);
-        read_iFparams(in_name,&iFparams);
+    read_iFparams(in_name,&iFparams);
 
 	if (!RestartRun)
 	{
 	    if(eqn_params.no_droplets == NO)
 	    {
-		printf("Initializing droplets\n");
-		level_func_pack.pos_component = LIQUID_COMP2;
+		    printf("Initializing droplets\n");
+		    level_func_pack.pos_component = LIQUID_COMP2;
+            //Initialize the interface interface curves (2D) and surfaces (3D) using level function and parameters, or in some cases, point set. 
 	    	FT_InitIntfc(&front,&level_func_pack);
-                initWaterDrops(&front);
+            initWaterDrops(&front);
 	    	if (debugging("trace")) printf("Passed init water droplets()\n");
 	    }
 	    else
 	    {
 	        printf("No droplets contained\n");
 	        level_func_pack.func_params = NULL;
-                level_func_pack.func = NULL;
+            level_func_pack.func = NULL;
 	        level_func_pack.pos_component = LIQUID_COMP2;
 	        level_func_pack.wave_type = -1; 
 	        FT_InitIntfc(&front,&level_func_pack);
@@ -146,7 +149,7 @@ int main(int argc, char **argv)
 
 	FT_InitVeloFunc(&front,&velo_func_pack);
 
-        v_cartesian->initMesh();
+    v_cartesian->initMesh();
 	l_cartesian->initMesh();
 	l_cartesian->findStateAtCrossing = ifluid_find_state_at_crossing;
 	if (RestartRun)
@@ -162,12 +165,12 @@ int main(int argc, char **argv)
 	else
 	{
 
-            init_fluid_state_func(&front,l_cartesian);
-            init_vapor_state_func(&front,v_cartesian);
-            init_temp_state_func(&front,v_cartesian);
+        init_fluid_state_func(&front,l_cartesian);
+        init_vapor_state_func(&front,v_cartesian);
+        init_temp_state_func(&front,v_cartesian);
 
 	    if(eqn_params.init_state == FOURIER_STATE)
-		l_cartesian->setParallelVelocity();
+		    l_cartesian->setParallelVelocity();
 	    else
 	        l_cartesian->setInitialCondition();
             if (debugging("trace"))
@@ -200,17 +203,17 @@ static  void melting_flow_driver(
 	VCARTESIAN *v_cartesian,
 	Incompress_Solver_Smooth_Basis *l_cartesian)
 {
-        double CFL;
-        int  dim = front->rect_grid->dim;
+    double CFL;
+    int  dim = front->rect_grid->dim;
 	IF_PARAMS *iFparams;
 	PARAMS *eqn_params;
 	MOVIE_OPTION *movie_option;
-        static LEVEL_FUNC_PACK level_func_pack;
+    static LEVEL_FUNC_PACK level_func_pack;
 
 	if (debugging("trace"))
 	    printf("Entering melting_flow_driver()\n");
 	Curve_redistribution_function(front) = expansion_redistribute;
-        CFL = Time_step_factor(front);
+    CFL = Time_step_factor(front);
 
 	iFparams = (IF_PARAMS*)front->extra1;
 	eqn_params = (PARAMS*)front->extra2;
@@ -218,10 +221,10 @@ static  void melting_flow_driver(
 
 	front->hdf_movie_var = NULL;
 
-        if (!RestartRun)
-        {
+    if (!RestartRun)
+    {
 	    FT_ResetTime(front);
-            FT_SetOutputCounter(front);
+        FT_SetOutputCounter(front);
             /* Front standard output*/
 	   /* FT_Save(front,out_name);
             v_cartesian->printFrontInteriorState(out_name);
@@ -229,6 +232,7 @@ static  void melting_flow_driver(
 	    if (eqn_params->prob_type == PARTICLE_TRACKING)
 	        printDropletsStates(front,out_name);*/
 
+        //Propagate the Front for one time step. The process includes advancing the front forward by one step to new positions, redistributing new interface mesh and resolving physical and topological bifurcations
 	    FT_Propagate(front);
 
 	    l_cartesian->solve(front->dt); /*compute pressure for vapor equation*/
@@ -238,7 +242,7 @@ static  void melting_flow_driver(
 	    /*For entrainment problem, droplets in area with supersat > 0*/
 	    /*This step must be after one step of v_catesian solver*/
 	    if(eqn_params->init_drop_state == PRESET_STATE)
-		v_cartesian->initPresetParticles(); 
+		    v_cartesian->initPresetParticles(); 
 
 	    /*For checking the result*/
 	    v_cartesian->checkField();
@@ -250,33 +254,33 @@ static  void melting_flow_driver(
 	    front->dt = std::min(front->dt,CFL*l_cartesian->max_dt);
 
 	    
-            l_cartesian->initMovieVariables();
-            v_cartesian->initMovieVariables();
+        l_cartesian->initMovieVariables();
+        v_cartesian->initMovieVariables();
 
-            if (eqn_params->prob_type == PARTICLE_TRACKING &&
+        if (eqn_params->prob_type == PARTICLE_TRACKING &&
 		movie_option->plot_particles == YES)
 	    {
                 vtk_plot_scatter(front);
 	    }
-            FT_AddMovieFrame(front,out_name,YES);
-        }
-        else
+        FT_AddMovieFrame(front,out_name,YES);
+    }
+    else
 	{
 	    FT_SetOutputCounter(front);
-            v_cartesian->initMovieVariables();
-            if (eqn_params->prob_type == PARTICLE_TRACKING)
-                vtk_plot_scatter(front);
-            FT_AddMovieFrame(front,out_name,YES);
+        v_cartesian->initMovieVariables();
+        if (eqn_params->prob_type == PARTICLE_TRACKING)
+            vtk_plot_scatter(front);
+        FT_AddMovieFrame(front,out_name,YES);
 	}
 
 	FT_TimeControlFilter(front);
 	/*Record the initial condition*/
 	/*v_cartesian->recordField(out_name,"velocity");*/
-        if (eqn_params->prob_type == PARTICLE_TRACKING)
+    if (eqn_params->prob_type == PARTICLE_TRACKING)
 	    v_cartesian->output();
 
-        for (;;)
-        {
+    for (;;)
+    {
 	    FT_Propagate(front);
 	    l_cartesian->solve(front->dt);
 	    printf("Passed solving NS equations\n");
@@ -288,48 +292,48 @@ static  void melting_flow_driver(
 	    }
 	    else
 	    {
-                 v_cartesian->solve(front->dt);
-                 printf("Passed solving vapor and temperature equations\n");
+            v_cartesian->solve(front->dt);
+            printf("Passed solving vapor and temperature equations\n");
 
-                 if (eqn_params->prob_type == PARTICLE_TRACKING)
-                 {
-                    ParticlePropagate(front);
-                    printf("Passed solving particle equations\n");
-                 }
+            if (eqn_params->prob_type == PARTICLE_TRACKING)
+            {
+                ParticlePropagate(front);
+                printf("Passed solving particle equations\n");
+            }
 	    }
 
 	    FT_AddTimeStepToCounter(front);
 	    FT_SetTimeStep(front);
 	    front->dt = FT_Min(front->dt,CFL*l_cartesian->max_dt);
 
-            printf("\ntime = %10.9f   step = %7d   dt = %10.9f\n",
+        printf("\ntime = %10.9f   step = %7d   dt = %10.9f\n",
                         front->time,front->step,front->dt);
-            fflush(stdout);
+        fflush(stdout);
 	    
-            if (FT_IsSaveTime(front))
+        if (FT_IsSaveTime(front))
 	    {
-                printf("Recording data for post analysis ...\n");
-		if (eqn_params->prob_type == PARTICLE_TRACKING)
-		    v_cartesian->output();
+            printf("Recording data for post analysis ...\n");
+		    if (eqn_params->prob_type == PARTICLE_TRACKING)
+		        v_cartesian->output();
 	    }
-            if (FT_IsMovieFrameTime(front))
+        if (FT_IsMovieFrameTime(front))
 	    {
-		printf("Output movie frame...\n");
+		    printf("Output movie frame...\n");
 		// Front standard output
-	 	if(movie_option->plot_particles == YES)
-		{
-		    vtk_plot_scatter(front);
-		    vtk_plot_sample_traj(front);
-		}
-                FT_AddMovieFrame(front,out_name,YES);
+	 	    if(movie_option->plot_particles == YES)
+		    {
+		        vtk_plot_scatter(front);
+		        vtk_plot_sample_traj(front);
+		    }
+            FT_AddMovieFrame(front,out_name,YES);
 	    }
 
-            if (FT_TimeLimitReached(front))
+        if (FT_TimeLimitReached(front))
 	    {
-		if(movie_option->plot_particles == YES)
-                    vtk_plot_scatter(front);
+		    if(movie_option->plot_particles == YES)
+                vtk_plot_scatter(front);
 	    	FT_AddMovieFrame(front,out_name,YES);
-                break;
+            break;
 	    }
 	    /* Output section, next dt may be modified */
 
